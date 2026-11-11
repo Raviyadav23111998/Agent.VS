@@ -125,7 +125,7 @@ namespace Agent.ToolWindow
                 if (!string.IsNullOrWhiteSpace(baked)) return baked.TrimEnd('/');
 
                 // PROD gateway (matches VS Code agent.apiUrl default).
-                return "https://api.storeglance.com/api/agent";
+                return "https://ai.storeglance.com/api";
             }
         }
 

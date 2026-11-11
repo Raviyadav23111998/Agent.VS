@@ -2,7 +2,7 @@ name: Build & Deploy VSIX
 
 # Builds the Visual Studio extension (.vsix) on Windows (MSBuild + VS SDK — it
 # cannot be built on Linux/macOS) and ships it to the VPS directory the API
-# serves from (/var/www/agent/visualstudio). One shared dir feeds prod/uat/sit;
+# serves from (/var/lib/storeglance-agent/vsix/visualstudio). One shared dir feeds prod/uat/sit;
 # the .vsix is tenant-agnostic (the WebView2 host resolves tenant at runtime via
 # the Agent/TenantDomain setting), so a single deploy updates every environment.
 #
@@ -11,7 +11,7 @@ name: Build & Deploy VSIX
 #   VPS_HOST       — VPS host/IP            (e.g. 203.0.113.10)
 #   VPS_USER       — ssh user               (e.g. root)
 # Optional repo variable:
-#   AG_VS_VSIX_DIR — remote dir (default /var/www/agent/visualstudio)
+#   AG_VS_VSIX_DIR — remote dir (default /var/lib/storeglance-agent/vsix/visualstudio)
 
 on:
   push:
@@ -55,7 +55,7 @@ jobs:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
-          REMOTE_DIR: ${{ vars.AG_VS_VSIX_DIR || '/var/www/agent/visualstudio' }}
+          REMOTE_DIR: ${{ vars.AG_VS_VSIX_DIR || '/var/lib/storeglance-agent/vsix/visualstudio' }}
           VSIX_NAME: ${{ steps.vsix.outputs.name }}
           VSIX_PATH: ${{ steps.vsix.outputs.path }}
         run: |
