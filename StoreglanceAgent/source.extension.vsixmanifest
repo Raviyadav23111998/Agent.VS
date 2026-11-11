@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="AntigravityAgent.52f1e63f-673e-4b47-ab8e-8a8b19685e13" Version="1.0" Language="en-US" Publisher="Storeglance" />
-    <DisplayName>Antigravity Agent</DisplayName>
-    <Description xml:space="preserve">Google DeepMind Agentic IDE for Visual Studio 2022.</Description>
+    <Identity Id="StoreglanceAgent.52f1e63f-673e-4b47-ab8e-8a8b19685e13" Version="1.0" Language="en-US" Publisher="Storeglance" />
+    <DisplayName>Storeglance Agent</DisplayName>
+    <Description xml:space="preserve">Storeglance AI agent for Visual Studio 2022: chat with your codebase, edit files and run tasks using your Storeglance account.</Description>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

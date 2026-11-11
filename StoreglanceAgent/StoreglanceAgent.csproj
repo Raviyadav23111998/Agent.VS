@@ -13,8 +13,8 @@
     <ProjectGuid>{A8B47833-D35F-485A-885E-53106B337F9E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AntigravityAgent</RootNamespace>
-    <AssemblyName>AntigravityAgent</AssemblyName>
+    <RootNamespace>StoreglanceAgent</RootNamespace>
+    <AssemblyName>StoreglanceAgent</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
@@ -45,11 +45,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AntigravityAgentPackage.cs" />
-    <Compile Include="ToolWindow\AntigravityToolWindow.cs" />
-    <Compile Include="ToolWindow\AntigravityToolWindowCommand.cs" />
-    <Compile Include="ToolWindow\AntigravityToolWindowControl.xaml.cs">
-      <DependentUpon>AntigravityToolWindowControl.xaml</DependentUpon>
+    <Compile Include="StoreglanceAgentPackage.cs" />
+    <Compile Include="ToolWindow\StoreglanceToolWindow.cs" />
+    <Compile Include="ToolWindow\StoreglanceToolWindowCommand.cs" />
+    <Compile Include="ToolWindow\StoreglanceToolWindowControl.xaml.cs">
+      <DependentUpon>StoreglanceToolWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolWindow\LocalToolExecutor.cs" />
     <Compile Include="ToolWindow\LocalAgentSocket.cs" />
@@ -100,12 +100,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="AntigravityAgentPackage.vsct">
+    <VSCTCompile Include="StoreglanceAgentPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ToolWindow\AntigravityToolWindowControl.xaml">
+    <Page Include="ToolWindow\StoreglanceToolWindowControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

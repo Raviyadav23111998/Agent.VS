@@ -34,16 +34,16 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Restore (PackageReference)
-        run: msbuild AntigravityAgent.sln /t:Restore /p:Configuration=Release
+        run: msbuild StoreglanceAgent.sln /t:Restore /p:Configuration=Release
 
       - name: Build VSIX (Release)
-        run: msbuild AntigravityAgent.sln /p:Configuration=Release /p:DeployExtension=false /m
+        run: msbuild StoreglanceAgent.sln /p:Configuration=Release /p:DeployExtension=false /m
 
       - name: Locate VSIX
         id: vsix
         shell: pwsh
         run: |
-          $vsix = Get-ChildItem -Recurse -Filter *.vsix -Path AntigravityAgent/bin/Release | Select-Object -First 1
+          $vsix = Get-ChildItem -Recurse -Filter *.vsix -Path StoreglanceAgent/bin/Release | Select-Object -First 1
           if (-not $vsix) { Write-Error "No .vsix produced by the build."; exit 1 }
           "path=$($vsix.FullName)" >> $env:GITHUB_OUTPUT
           "name=$($vsix.Name)"     >> $env:GITHUB_OUTPUT
@@ -76,7 +76,7 @@ jobs:
           scp -i $key -o StrictHostKeyChecking=accept-new "$env:VSIX_PATH" "$($target):$($env:REMOTE_DIR)/$($env:VSIX_NAME)"
 
           # Confirm the file exists on the server (size > 0). The filename is
-          # always AntigravityAgent.vsix, so a strict "newest" check is racy when
+          # always StoreglanceAgent.vsix, so a strict "newest" check is racy when
           # several env branches deploy concurrently — just verify presence and
           # never let a flaky check fail an upload that already succeeded.
           $size = (ssh -i $key -o StrictHostKeyChecking=accept-new $target "stat -c %s '$env:REMOTE_DIR/$env:VSIX_NAME' 2>/dev/null || echo 0")
@@ -90,7 +90,7 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: AntigravityAgent-vsix-${{ github.ref_name }}
-          path: AntigravityAgent/bin/Release/*.vsix
+          name: StoreglanceAgent-vsix-${{ github.ref_name }}
+          path: StoreglanceAgent/bin/Release/*.vsix
           if-no-files-found: warn
           overwrite: true

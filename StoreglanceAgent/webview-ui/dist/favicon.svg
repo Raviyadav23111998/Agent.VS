@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>.t{fill:#111318}.r{fill:none;stroke:#fff}.p{fill:#fff}@media (prefers-color-scheme:dark){.t{fill:#f2f2f2}.r{stroke:#0b0d12}.p{fill:#0b0d12}}</style>
+  <rect class="t" width="32" height="32" rx="8"/>
+  <circle class="r" cx="16" cy="16" r="8.6" stroke-width="3"/>
+  <circle class="p" cx="18.9" cy="13.1" r="3.4"/>
+</svg>
