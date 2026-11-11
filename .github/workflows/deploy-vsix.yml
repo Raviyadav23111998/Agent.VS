@@ -1,0 +1,96 @@
+name: Build & Deploy VSIX
+
+# Builds the Visual Studio extension (.vsix) on Windows (MSBuild + VS SDK — it
+# cannot be built on Linux/macOS) and ships it to the VPS directory the API
+# serves from (/var/www/agent/visualstudio). One shared dir feeds prod/uat/sit;
+# the .vsix is tenant-agnostic (the WebView2 host resolves tenant at runtime via
+# the Agent/TenantDomain setting), so a single deploy updates every environment.
+#
+# Required repo secrets:
+#   VPS_SSH_KEY    — private key authorised on the VPS (root@${DEPLOY_HOST})
+#   VPS_HOST       — VPS host/IP            (e.g. 203.0.113.10)
+#   VPS_USER       — ssh user               (e.g. root)
+# Optional repo variable:
+#   AG_VS_VSIX_DIR — remote dir (default /var/www/agent/visualstudio)
+
+on:
+  push:
+    branches: [main, PROD, UAT, SIT]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vs-vsix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore (PackageReference)
+        run: msbuild AntigravityAgent.sln /t:Restore /p:Configuration=Release
+
+      - name: Build VSIX (Release)
+        run: msbuild AntigravityAgent.sln /p:Configuration=Release /p:DeployExtension=false /m
+
+      - name: Locate VSIX
+        id: vsix
+        shell: pwsh
+        run: |
+          $vsix = Get-ChildItem -Recurse -Filter *.vsix -Path AntigravityAgent/bin/Release | Select-Object -First 1
+          if (-not $vsix) { Write-Error "No .vsix produced by the build."; exit 1 }
+          "path=$($vsix.FullName)" >> $env:GITHUB_OUTPUT
+          "name=$($vsix.Name)"     >> $env:GITHUB_OUTPUT
+          Write-Host "Built $($vsix.Name) ($([math]::Round($vsix.Length/1MB,2)) MB)"
+
+      - name: Deploy to VPS
+        shell: pwsh
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          REMOTE_DIR: ${{ vars.AG_VS_VSIX_DIR || '/var/www/agent/visualstudio' }}
+          VSIX_NAME: ${{ steps.vsix.outputs.name }}
+          VSIX_PATH: ${{ steps.vsix.outputs.path }}
+        run: |
+          $key = Join-Path $env:USERPROFILE "deploy_key"
+          # OpenSSH rejects the key ("invalid format") unless it is LF-only,
+          # BOM-free, and ends with a trailing newline. Normalise all three.
+          $keyText = $env:VPS_SSH_KEY.Replace("`r`n", "`n")
+          if (-not $keyText.EndsWith("`n")) { $keyText += "`n" }
+          [IO.File]::WriteAllText($key, $keyText, (New-Object System.Text.UTF8Encoding $false))
+          icacls $key /inheritance:r | Out-Null
+          icacls $key /grant:r "$($env:USERNAME):(R)" | Out-Null
+
+          $target = "$($env:VPS_USER)@$($env:VPS_HOST)"
+          $ts = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+          $remote = "mkdir -p $env:REMOTE_DIR; if [ -f $env:REMOTE_DIR/$env:VSIX_NAME ]; then cp -f $env:REMOTE_DIR/$env:VSIX_NAME $env:REMOTE_DIR/$env:VSIX_NAME.bak.$ts; fi; ls -t $env:REMOTE_DIR/*.vsix.bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f"
+
+          ssh -i $key -o StrictHostKeyChecking=accept-new $target $remote
+          scp -i $key -o StrictHostKeyChecking=accept-new "$env:VSIX_PATH" "$($target):$($env:REMOTE_DIR)/$($env:VSIX_NAME)"
+
+          # Confirm the file exists on the server (size > 0). The filename is
+          # always AntigravityAgent.vsix, so a strict "newest" check is racy when
+          # several env branches deploy concurrently — just verify presence and
+          # never let a flaky check fail an upload that already succeeded.
+          $size = (ssh -i $key -o StrictHostKeyChecking=accept-new $target "stat -c %s '$env:REMOTE_DIR/$env:VSIX_NAME' 2>/dev/null || echo 0")
+          if ([string]::IsNullOrWhiteSpace($size) -or [int]($size.Trim()) -le 0) {
+            Write-Error "Deployed file '$env:VSIX_NAME' not found on server."; exit 1
+          }
+          Write-Host "Deployed $env:VSIX_NAME ($([int]($size.Trim())) bytes) -> $($env:VPS_HOST):$env:REMOTE_DIR"
+
+      - name: Upload VSIX artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: AntigravityAgent-vsix-${{ github.ref_name }}
+          path: AntigravityAgent/bin/Release/*.vsix
+          if-no-files-found: warn
+          overwrite: true

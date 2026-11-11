@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+  
+  <Commands package="guidAntigravityAgentPackage">
+    <Buttons>
+      <Button guid="guidAntigravityAgentPackageCmdSet" id="AntigravityToolWindowCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+        <Strings>
+          <ButtonText>Antigravity Agent</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <GuidSymbol name="guidAntigravityAgentPackage" value="{a5db0112-c2cb-4dfd-a83a-dbafaa670b88}" />
+    
+    <GuidSymbol name="guidAntigravityAgentPackageCmdSet" value="{0140228d-1959-4500-b631-f9ad20e7df7e}">
+      <IDSymbol name="AntigravityToolWindowCommandId" value="0x0100" />
+    </GuidSymbol>
+    
+    <GuidSymbol name="guidImages" value="{d0e65330-91a5-48fa-b9a3-df322e70775d}">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
